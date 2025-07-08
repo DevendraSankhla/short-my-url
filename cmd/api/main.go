@@ -2,6 +2,14 @@ package main
 
 import "fmt"
 
+type application struct {
+}
+
 func main() {
-	fmt.Println("Server started...")
+	app := &application{}
+
+	err := app.serve()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
