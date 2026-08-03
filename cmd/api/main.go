@@ -12,7 +12,7 @@ type application struct {
 }
 
 func main() {
-	db, err := database.NewFileDB("D:\\Downloads\\urlShortner.text")
+	db, err := database.NewFileDB("D:\\Downloads\\urlShortner")
 	if err != nil {
 		fmt.Println("Error initializing database : ", err)
 	}
