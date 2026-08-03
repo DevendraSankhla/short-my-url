@@ -2,20 +2,27 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/devendrasankhla/short-my-url/internals/database"
 )
 
 type application struct {
-	counter    uint64
-	shornedUrl map[string]string
+	models  database.Models
+	counter uint64
 }
 
 func main() {
-	app := &application{
-		counter:    0,
-		shornedUrl: make(map[string]string),
+	db, err := database.NewFileDB("D:\\Downloads\\urlShortner.text")
+	if err != nil {
+		fmt.Println("Error initializing database : ", err)
 	}
 
-	err := app.serve()
+	app := &application{
+		models:  database.NewModels(db),
+		counter: 0,
+	}
+
+	err = app.serve()
 	if err != nil {
 		fmt.Println(err)
 	}
