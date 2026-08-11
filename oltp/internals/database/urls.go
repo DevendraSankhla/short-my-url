@@ -30,7 +30,6 @@ func (m *URlModel) AddUrl(id string, url URL) error {
 func (m *URlModel) GetUrl(id string) (string, error) {
 	url, err := m.db.Get(id)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	return url.OriginalUrl, nil

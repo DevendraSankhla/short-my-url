@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
-	"github.com/devendrasankhla/short-my-url/internals/database"
+	"github.com/devendrasankhla/short-my-url/oltp/internals/database"
 	"github.com/sqids/sqids-go"
 )
 
@@ -63,7 +64,20 @@ func (app *application) createShortUrl(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getShortUrl(w http.ResponseWriter, r *http.Request) {
+	defer func(start time.Time) {
+		duration := time.Since(start)
+		slog.Info("execution_time",
+			"duration_ms", duration.Milliseconds(), // Will show 0 if under 1ms
+			"duration_str", duration.String(), // Will show exact time like "341µs" or "820ns"
+		)
+	}(time.Now())
+
 	urlID := r.PathValue("id")
+	// err := app.messaageQueue.Push(urlID)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+
 	originalUrl, err := app.models.Urls.GetUrl(urlID)
 	if err != nil {
 		fmt.Println(err)
