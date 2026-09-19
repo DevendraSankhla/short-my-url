@@ -3,15 +3,16 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func (app *application) serve() error {
 	server := &http.Server{
-		Addr:    ":4000",
+		Addr:    ":" + strconv.Itoa(app.cfg.port),
 		Handler: app.routes(),
 	}
 
-	fmt.Println("Starting server at 4000")
+	fmt.Println("Starting server at ", string(app.cfg.port))
 
 	err := server.ListenAndServe()
 	if err != nil {

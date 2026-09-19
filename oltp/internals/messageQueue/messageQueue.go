@@ -2,6 +2,7 @@ package messagequeue
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -52,6 +53,9 @@ func NewRabbmitMQ() (*RabbmitMQ, error) {
 }
 
 func (r *RabbmitMQ) Push(urlID string) error {
+	if r == nil {
+		return errors.New("Message queue is not initialized!")
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

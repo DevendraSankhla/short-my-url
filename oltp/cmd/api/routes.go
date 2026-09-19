@@ -18,6 +18,7 @@ func (app *application) routes() http.Handler {
 
 	mux.HandleFunc("POST /v1/url", app.createShortUrl)
 	mux.HandleFunc("GET /{id}", app.getShortUrl)
+	mux.HandleFunc("GET /{id}/stat", app.getUrlDetails)
 	mux.Handle("GET /", http.FileServer(http.FS(homeFS)))
 
 	return mux

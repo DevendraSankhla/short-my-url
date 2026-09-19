@@ -8,22 +8,22 @@ import (
 )
 
 type Database interface {
-	Insert(string, URL) error
+	Insert(int64, URL) error
 	//Update()
-	Get(string) (URL, error)
+	Get(int64) (URL, error)
 	//Delete()
 }
 
 type FileDB struct {
 	filePath string
 	mu       sync.Mutex
-	data     map[string]URL
+	data     map[int64]URL
 }
 
 func NewFileDB(filePath string) (*FileDB, error) {
 	db := &FileDB{
 		filePath: filePath,
-		data:     make(map[string]URL),
+		data:     make(map[int64]URL),
 	}
 
 	//if file does not exists
@@ -68,7 +68,7 @@ func (db *FileDB) saveToFile() error {
 	return os.WriteFile(db.filePath, bytes, 0644)
 }
 
-func (db *FileDB) Insert(id string, url URL) error {
+func (db *FileDB) Insert(id int64, url URL) error {
 	if _, ok := db.data[id]; ok {
 		return errors.New("Duplicate URL")
 	}
@@ -77,15 +77,15 @@ func (db *FileDB) Insert(id string, url URL) error {
 	if err != nil {
 		return err
 	}
+
+	err = db.loadDataFromFile()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (db *FileDB) Get(id string) (URL, error) {
-	err := db.loadDataFromFile()
-	if err != nil {
-		return URL{}, err
-	}
-
+func (db *FileDB) Get(id int64) (URL, error) {
 	urlStruct, ok := db.data[id]
 	if !ok {
 		return URL{}, errors.New("Not Found!")

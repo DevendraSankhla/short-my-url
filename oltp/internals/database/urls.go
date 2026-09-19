@@ -8,7 +8,7 @@ import (
 type URL struct {
 	ID          int64     `json:"id"`
 	OriginalUrl string    `json:"originalUrl"`
-	Alias       string    `json:"alias"`
+	ShortKey    string    `json:"alias"`
 	CreatedAt   time.Time `json:"createdAt"`
 	ModifiedAt  time.Time `json:"modifiedAt"`
 	TotalHits   int       `json:"totalHits"`
@@ -18,7 +18,7 @@ type URlModel struct {
 	db Database
 }
 
-func (m *URlModel) AddUrl(id string, url URL) error {
+func (m *URlModel) AddUrl(id int64, url URL) error {
 	err := m.db.Insert(id, url)
 	if err != nil {
 		fmt.Println(err)
@@ -27,10 +27,10 @@ func (m *URlModel) AddUrl(id string, url URL) error {
 	return nil
 }
 
-func (m *URlModel) GetUrl(id string) (string, error) {
+func (m *URlModel) GetUrl(id int64) (URL, error) {
 	url, err := m.db.Get(id)
 	if err != nil {
-		return "", err
+		return URL{}, err
 	}
-	return url.OriginalUrl, nil
+	return url, nil
 }

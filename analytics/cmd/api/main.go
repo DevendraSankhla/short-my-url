@@ -2,20 +2,30 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	messagequeue "github.com/devendrasankhla/short-my-url/analytics/internals/messageQueue"
 )
 
-func healthTest(w http.ResponseWriter, r *http.Request) {
-	mq, _ := messagequeue.NewRabbmitMQ()
-	mq.Pull()
-
-	w.Write([]byte(fmt.Sprint("Helllo, From analyics microservice")))
+type application struct {
+	messaageQueue messagequeue.MessageQueue
 }
 
 func main() {
-	fmt.Println("Welcome to analytics microservice, server started on 3000")
-	http.HandleFunc("/", healthTest)
-	http.ListenAndServe(":3000", nil)
+	rabbitMQ, err := messagequeue.NewRabbmitMQ()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rabbitMQ.Close()
+
+	app := &application{
+		messaageQueue: rabbitMQ,
+	}
+
+	app.messaageQueue.Pull()
+
+	err = app.serve()
+	if err != nil {
+		fmt.Println(err)
+	}
 }

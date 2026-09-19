@@ -26,28 +26,13 @@ Testing Checklist
  Load test: how many redirects/sec before latency degrades? (use k6)
  Race detector clean (go test -race ./...)
 
-Skills Gained: layered architecture, caching, rate limiting, migrations, containerization basics.
+## TODO — 2-Week Drill
 
-
-my-backend-app/
-├── cmd/                  # Application entry points (e.g., main.go, server.js)
-├── src/ (or pkg/)
-│   ├── config/           # Environment variables and configuration
-│   ├── handlers/         # Presentation Layer (HTTP/REST controllers, gRPC)
-│   ├── services/         # Business Logic Layer (Core rules, calculations)
-│   ├── repositories/     # Data Access Layer (Database queries, external APIs)
-│   ├── models/           # Data structures and entities
-│   └── interfaces/       # Explicit interface definitions (if required by language)
-├── tests/                # Unit and integration tests
-├── README.md
-└── package.json / go.mod # Dependency management
-
-
-📚 Books (The Gold Standards)
-"Clean Architecture" by Robert C. Martin (Uncle Bob) – The definitive guide on structuring applications using boundaries and interfaces.
-"Domain-Driven Design (DDD)" by Eric Evans – Advanced concept, but great for learning how to model complex backend systems.
-
-🌐 Articles & Concepts to Google
-SOLID Principles: Focus heavily on the Dependency Inversion Principle (D), which dictates why we use interfaces.
-The Repository Pattern: Read articles specifically breaking down the separation of services and repositories.
-Hexagonal Architecture (Ports and Adapters): A widely adopted industry framework built entirely around interfaces.
+1. Fix the data races and the concurrency bugs — atomic counter or injected ID source, mutex on FileDB, `return` after every `WriteHeader`. Must pass `go test -race ./...`.
+2. Make the redirect path non-blocking and fault-tolerant — queue push goes async (buffered channel + background flusher with retry), so a dead broker costs zero redirect latency.
+3. Single module, one messagequeue package — remove the copy-pasted `internals/messageQueue`.
+4. Define the `ClickEvent` schema (shortCode, timestamp, referrer, userAgent, IP); producer pushes the envelope, not a raw urlID. Use manual acks + prefetch + a context-cancellable consumer; document the at-least-once / idempotency decision.
+5. Add `Update()` to the data layer and make stats real — then Redis cache-aside becomes obvious, not academic.
+6. HTTP middleware: structured logging with request IDs, recover-from-panic, server timeouts, and a token-bucket rate limiter (implement it yourself — NFR).
+7. Config from env vars, validated at startup (fail fast). Then a multi-stage Dockerfile with distroless final image.
+8. Load test with k6 — measure redirects/sec before latency degrades — and report the numbers here in the readme.

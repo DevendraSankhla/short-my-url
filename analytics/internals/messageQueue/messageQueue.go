@@ -73,6 +73,9 @@ func (r *RabbmitMQ) Push(urlID string) error {
 }
 
 func (r *RabbmitMQ) Pull() {
+	//TODO : This is currently non blocking and existing,
+	// works fine but when main exits because of shutdown,
+	// messages or half proccesed operation get lost.
 	msgs, err := r.channel.Consume(
 		r.queue.Name,
 		"",
@@ -86,16 +89,18 @@ func (r *RabbmitMQ) Pull() {
 		return
 	}
 
-	forever := make(chan struct{})
+	//forever := make(chan struct{})
 
 	go func() {
 		for d := range msgs {
-			fmt.Println("Message recieved : ", string(d.Body))
+			fmt.Println("Message recieved work started.")
+			time.Sleep(3 * time.Second)
+			fmt.Println("Message Processed: ", string(d.Body))
 		}
-		close(forever)
+		//close(forever)
 	}()
 
-	<-forever
+	//<-forever
 }
 
 func (r *RabbmitMQ) Close() {
