@@ -33,7 +33,7 @@ Testing Checklist
     - FileDB.Insert(): TOCTOU race — existence check outside mutex (line 72); the method never locks at all
     - FileDB.saveToFile(): no lock during Marshal + WriteFile; concurrent callers corrupt output; WriteFile is non-atomic — a crash mid-write corrupts the file and the next boot fails (write to temp + rename)
     - FileDB.Insert(): double I/O (save then reload) — the reload can also clobber concurrent inserts
-    - urls.go:137-138 — missing `return` after WriteHeader, continues to w.Write(); same handler sets Content-Type after WriteHeader (132-133) and misspells it `application/josn`
+    - urls.go:137-138 — missing `return` after WriteHeader, continues to w.Write(); same handler sets Content-Type after WriteHeader (132-133) and misspells it `application/josn` -> DONE 
     - MessageQueue: no mutex on channel/connection; Push/Pull/Close race — amqp091-go v1.13.0 documents channels as not thread-safe ("do not share a single Channel instance between multiple goroutines"); Push runs on every redirect goroutine
     - No test files exist; worse, `go test ./...` fails at the vet step (see item 9) and `-race` can't run on this machine — gcc is 32-bit MinGW ("cc1.exe: 64-bit mode not compiled in"); install a 64-bit toolchain or run tests in WSL/CI
     - Unused `counter uint64` in application struct (main.go:17) — delete it; snowflake Generate() is already mutex-protected

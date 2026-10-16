@@ -130,11 +130,12 @@ func (app *application) getUrlDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-type", "application/josn")
+	w.Header().Set("Content-type", "application/json")
 	jsonUrl, err := json.MarshalIndent(url, "", "\t")
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.Write(jsonUrl)
 }
